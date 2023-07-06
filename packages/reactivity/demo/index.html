@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- <script src="./vue.js"></script> -->
+    <script src="../dist/reactivity.global.js"></script>
+    <script>
+      //   const { reactive } = Vue;
+      //   console.log('reactive: ', reactive);
+      const { reactive, effect } = VueReactivity;
+
+      const o = { name: "wxx", age: 12 };
+      const state1 = reactive(o);
+      const state2 = reactive(o);
+      const state3 = reactive(state1);
+      //   console.log("state1==state2: ", state1 === state2);
+      //   console.log("state1==state3: ", state1 === state3);
+
+      //   state3.name = "WXXX";
+      //   console.log('state3: ', state3);
+      //   console.log('state3.name: ', state3.name);
+
+      effect(() => {
+        app.innerHTML = `state.name: ${state3.name}`;
+        state3.age
+      });
+
+      setTimeout(() => {
+        state3.name = "WXXX";
+      }, 2000);
+    </script>
+  </body>
+</html>
