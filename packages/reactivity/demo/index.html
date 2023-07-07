@@ -7,12 +7,15 @@
   </head>
   <body>
     <div id="app"></div>
-    <!-- <script src="./vue.js"></script> -->
+    <div id="app1"></div>
+    <script src="./vue.js"></script>
     <script src="../dist/reactivity.global.js"></script>
     <script>
       //   const { reactive } = Vue;
       //   console.log('reactive: ', reactive);
-      const { reactive, effect } = VueReactivity;
+      // const { reactive, effect } = VueReactivity;
+
+      const { reactive, effect } = Vue;
 
       const o = { name: "wxx", age: 12 };
       const state1 = reactive(o);
@@ -24,11 +27,17 @@
       //   state3.name = "WXXX";
       //   console.log('state3: ', state3);
       //   console.log('state3.name: ', state3.name);
+      let n = 0;
 
       effect(() => {
+        console.log(++n);
         app.innerHTML = `state.name: ${state3.name}`;
-        state3.age
+        effect(() => {
+          console.log(++n);
+          app1.innerHTML = `state.name1: ${state3.name}`;
+        });
       });
+      n = 0;
 
       setTimeout(() => {
         state3.name = "WXXX";

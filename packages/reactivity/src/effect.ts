@@ -34,7 +34,7 @@ class ReactiveEffect {
       try {
         activeEffect = this;
         effectStack.push(activeEffect);
-        console.log("effectStack: ", effectStack);
+        // console.log("effectStack: ", effectStack);
         this.fn(); // 执行fn的时候就会访问reactive对象的属性，也就执行 reactiveProxy对象的get方法，进行属性和effect的对应收集
       } finally {
         // 内层的effect执行完毕，需要把 activeEffect 改为外层的effect
@@ -60,9 +60,9 @@ const targetMap = new WeakMap();
 
 export const track = function (target: Record<any, any>, key: string | symbol) {
   // 对象的属性 和activeEffect 对应关系
-  console.log("target: ", target);
-  console.log("key: ", key);
-  console.log("activeEffect: ", activeEffect);
+  // console.log("target: ", target);
+  // console.log("key: ", key);
+  // console.log("activeEffect: ", activeEffect);
 
   // 在effect中的才需要收集
   if (!isTracking()) {
@@ -80,24 +80,30 @@ export const track = function (target: Record<any, any>, key: string | symbol) {
     keyDepMap = new Set();
     targetMapObject.set(key, keyDepMap);
   }
-  if (!keyDepMap.has(activeEffect)) {
+  if (!keyDepMap.has(activeEffect) ) {
     keyDepMap.add(activeEffect);
-
     // 给当前的effect 收集 他所依赖的属性对应的effect数组
     activeEffect.deps.push(keyDepMap);
   }
 };
 
+// 对象某个属性变了，才会执行属性对应的effect
 export const trigger = function (
   target: Record<any, any>,
   key: string | symbol
 ) {
   let targetMapObject = targetMap.get(target);
-  let keyDepMap = targetMapObject.get(key);
-  
-  keyDepMap.forEach((element: ReactiveEffect) => {
-    element.run();
-  });
+
+  if (!targetMapObject) return;
+  if (key !== undefined) {
+    let keyDepMap = targetMapObject.get(key);
+    for (const effect of keyDepMap) {
+      console.log(123)
+      if (effect !== activeEffect) {
+        effect.run();
+      }
+    }
+  }
 };
 
 export const effect = function (fn: Function) {

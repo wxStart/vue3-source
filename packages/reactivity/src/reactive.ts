@@ -13,16 +13,20 @@ const handler: ProxyHandler<Record<any, any>> = {
       return true;
     }
     const res = Reflect.get(target, key, recevier); //相当于 target[key]
-    console.log("取值了");
+    // console.log("取值了");
     //取值的时候，可以收集他在哪个effect中
     track(target, key);
     return res;
   },
   set(target, key, value, recevier) {
+    let oldVlaue = (target as any)[key];
     const res: boolean = Reflect.set(target, key, value, recevier); // 相当于 target[key]=value
     // 设置值的时候，更新effect
-    console.log("进行了设置");
-    trigger(target, key);
+    // console.log("进行了设置");
+
+    if (oldVlaue !== value) {
+      trigger(target, key);
+    }
     return res;
   },
 };
