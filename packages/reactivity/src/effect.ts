@@ -43,6 +43,22 @@ class ReactiveEffect {
       }
     }
   }
+  stop() {
+    if (this.active) {
+      clearEffect(this);
+      this.active = false;
+    }
+  }
+}
+
+function clearEffect(effect: ReactiveEffect) {
+  // deps实际上就是引用的 targetMapObject.get(key)  删除这里就相当于删除 targetMap中的值
+  //  trigger 的时候就会执行 targetMap.get(target);中的值
+  const { deps } = effect; 
+  for (const depset of deps) {
+    console.log("depset: ", depset);
+    depset.delete(effect);
+  }
 }
 
 export const isTracking = function () {
@@ -80,7 +96,7 @@ export const track = function (target: Record<any, any>, key: string | symbol) {
     keyDepMap = new Set();
     targetMapObject.set(key, keyDepMap);
   }
-  if (!keyDepMap.has(activeEffect) ) {
+  if (!keyDepMap.has(activeEffect)) {
     keyDepMap.add(activeEffect);
     // 给当前的effect 收集 他所依赖的属性对应的effect数组
     activeEffect.deps.push(keyDepMap);
@@ -98,7 +114,6 @@ export const trigger = function (
   if (key !== undefined) {
     let keyDepMap = targetMapObject.get(key);
     for (const effect of keyDepMap) {
-      console.log(123)
       if (effect !== activeEffect) {
         effect.run();
       }
@@ -109,4 +124,5 @@ export const trigger = function (
 export const effect = function (fn: Function) {
   const _effect = new ReactiveEffect(fn);
   _effect.run();
+  return _effect.run.bind(_effect);
 };
