@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="app1"></div>
+    <script src="./vue.js"></script>
+    <script src="../dist/reactivity.global.js"></script>
+    <script>
+      const { reactive, effect, computed } = VueReactivity;
+
+      const state3 = reactive({ name: "wxx", age: 12 });
+      
+      const cAge = computed({
+        get() {
+          console.log('执行了run')
+          console.log("state3.age", state3.age);
+          return state3.age + 10;
+        },
+        set(value) {
+          console.log(value);
+        },
+      });
+
+      effect(() => {
+        console.log(111);
+        console.log(cAge.value);
+        console.log(cAge.value);
+        // console.log(cAge.value);
+      });
+
+      setTimeout(() => {
+        state3.age = 22;
+      }, 2000);
+    </script>
+  </body>
+</html>

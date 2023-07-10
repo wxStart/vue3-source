@@ -18,11 +18,11 @@ let effectStack: Array<ReactiveEffect> = [];
 
 let activeEffect: ReactiveEffect;
 
-class ReactiveEffect {
+export class ReactiveEffect {
   //让effect 记录依赖了那些属性， 同时记录当前属性依赖了那些effect
   public active = true;
   public deps: Array<Set<ReactiveEffect>> = [];
-  constructor(public fn: Function) {}
+  constructor(public fn: Function, public scheduler?: Function) {}
   run() {
     // 调用fn执行一次
     if (!this.active) {
@@ -35,7 +35,7 @@ class ReactiveEffect {
         activeEffect = this;
         effectStack.push(activeEffect);
         // console.log("effectStack: ", effectStack);
-        this.fn(); // 执行fn的时候就会访问reactive对象的属性，也就执行 reactiveProxy对象的get方法，进行属性和effect的对应收集
+        return this.fn(); // 执行fn的时候就会访问reactive对象的属性，也就执行 reactiveProxy对象的get方法，进行属性和effect的对应收集
       } finally {
         // 内层的effect执行完毕，需要把 activeEffect 改为外层的effect
         effectStack.pop();
@@ -54,7 +54,7 @@ class ReactiveEffect {
 function clearEffect(effect: ReactiveEffect) {
   // deps实际上就是引用的 targetMapObject.get(key)  删除这里就相当于删除 targetMap中的值
   //  trigger 的时候就会执行 targetMap.get(target);中的值
-  const { deps } = effect; 
+  const { deps } = effect;
   for (const depset of deps) {
     console.log("depset: ", depset);
     depset.delete(effect);
@@ -96,6 +96,15 @@ export const track = function (target: Record<any, any>, key: string | symbol) {
     keyDepMap = new Set();
     targetMapObject.set(key, keyDepMap);
   }
+  // if (!keyDepMap.has(activeEffect)) {
+  //   keyDepMap.add(activeEffect);
+  //   // 给当前的effect 收集 他所依赖的属性对应的effect数组
+  //   activeEffect.deps.push(keyDepMap);
+  // }
+  trackEffect(keyDepMap);
+};
+
+export const trackEffect = function (keyDepMap: Set<ReactiveEffect>) {
   if (!keyDepMap.has(activeEffect)) {
     keyDepMap.add(activeEffect);
     // 给当前的effect 收集 他所依赖的属性对应的effect数组
@@ -113,10 +122,24 @@ export const trigger = function (
   if (!targetMapObject) return;
   if (key !== undefined) {
     let keyDepMap = targetMapObject.get(key);
-    for (const effect of keyDepMap) {
-      if (effect !== activeEffect) {
-        effect.run();
+
+    // for (const effect of keyDepMap) {
+    //   if (effect !== activeEffect) {
+    //     effect.run();
+    //   }
+    // }
+    triggerEffects(keyDepMap);
+  }
+};
+
+export const triggerEffects = function (keyDepMap: Set<ReactiveEffect>) {
+  for (const effect of keyDepMap) {
+    if (effect !== activeEffect) {
+      if (effect.scheduler) {
+        //  如果 scheduler 存在执行这个，主要是计算属性自定义的执行 而不直接执行run函数
+        return effect.scheduler();
       }
+      effect.run();
     }
   }
 };
