@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="app1"></div>
+    <script src="./vue.js"></script>
+    <script src="../dist/reactivity.global.js"></script>
+    <script>
+      const { reactive, effect, ref } = VueReactivity;
+      const state3 = ref(0);
+      console.log('state3: ', state3);
+      effect(() => {
+        console.log("依赖值改变了");
+        console.log(state3.value);
+      });
+
+      setTimeout(() => {
+        state3.value = 1;
+      }, 2000);
+    </script>
+  </body>
+</html>
