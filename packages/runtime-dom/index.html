@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">1231</div>
+    <!-- <script src="./vue.global.js"></script> -->
+    <script src="./dist/runtime-dom.global.js"></script>
+    <script>
+      const { ref, createApp, h } = VueRuntimeDOM;
+      const App = {
+        props: {
+          title: {},
+        },
+        setup() {
+          const myCount = ref(1);
+          const isFlag = ref(true);
+
+          const add = () => {
+            isFlag.value = false;
+            setTimeout(() => {
+              myCount.value++;
+            }, 0);
+          };
+
+          //   return () => {
+          //     return h(
+          //       "div",
+          //       {
+          //         onClick: add,
+          //       },
+          //       "点击我会增加值：~~~~~" + myCount.value
+          //     );
+          //   };
+
+          return { add, myCount, isFlag };
+        },
+        render(proxy) {
+          return this.isFlag.value
+            ? h(
+                "div",
+                {
+                  onClick: this.add,
+                  style: {
+                    color: "red",
+                  },
+                },
+                h("span", "12341span"),
+                "点击我会增加值：~~~~~",
+                this.myCount.value
+              )
+            : h(
+                "h1",
+                {
+                  onClick: this.add,
+                  style: {
+                    color: this.myCount.value % 2 ? "red" : "green",
+                  },
+                },
+                "我是false",
+                this.myCount.value
+              );
+        },
+      };
+
+      createApp(App, { title: "12", ab: 12 }).mount("#app");
+    </script>
+  </body>
+</html>
