@@ -208,8 +208,8 @@ export function createRenderer(renderOptios: any) {
       const child = c2[index];
       newKeyIndexMap.set(child.key, index); //!key:下标 c2中的下标
     }
-    console.log("newKeyIndexMap: ", newKeyIndexMap);
-    const handlerS2length = l2 - s2 + 1;
+    let handlerS2length = l2 - s2 + 1;
+    handlerS2length = handlerS2length > 0 ? handlerS2length : 0;
     const newIndexMapHanded = new Array(handlerS2length).fill(0);
 
     for (let index = s1; index <= l1; index++) {
