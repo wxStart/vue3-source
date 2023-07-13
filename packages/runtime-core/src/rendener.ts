@@ -37,7 +37,7 @@ export function createRenderer(renderOptios: any) {
       if (!instance.isMounted) {
         // 组件初始化流程
         // 渲染页面时候会进行依赖收集
-        const subTree = instance.render.call(proxy, proxy);
+        const subTree = instance.render.call(proxy, proxy); // 调用的是h函数也返回的是vnode
         instance.subTree = subTree;
 
         patch(null, instance.subTree, container);
