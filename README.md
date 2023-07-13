@@ -1,4 +1,17 @@
-## vue3模块说明
+###  工程运行效果
+
+1. `$ pnpm install`
+
+#### 响应式模块
+2. `$ pnpm run dev:reactivity`     
+然后打开 `packages/reactivity/dome`中的html模块看效果
+
+#### vue模块
+3.  `$ pnpm run dev:runtime-dom`        
+然后打开 `packages/runtime-dom/index.html`模块看效果
+
+
+### vue3模块说明
 
 
 #### compiler-core 【重点】
