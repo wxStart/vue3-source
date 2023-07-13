@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h2>没有规则变换的children数组</h2>
+    <div id="app">1231</div>
+    <!-- <script src="./vue.global.js"></script> -->
+    <script src="../dist/runtime-dom.global.js"></script>
+    <script>
+      const { ref, createApp, h } = VueRuntimeDOM;
+      const App = {
+        props: {
+          title: {},
+        },
+        setup() {
+          const myCount = ref(1);
+          const add = () => {
+            myCount.value++;
+          };
+          return { add, myCount };
+        },
+        render(proxy) {
+          return h(
+            "div",
+            {
+              onClick: this.add,
+              // style: {
+              //   color: this.myCount.value % 2 ? "red" : "green",
+              //   padding: "20px",
+              //   background: "#ddd",
+              // },
+              title: proxy.title,
+            },
+            this.myCount.value % 2
+              ? ["a", "b", "c",'m', "d", "e", "f", "g"].map((el) =>
+                  h("div", { key: el }, el)
+                )
+              : ["a", "b", "e", "c", "d", "h", "f", "g"].map((el) =>
+                  h("div", { key: el }, el)
+                )
+          );
+        },
+      };
+
+      createApp(App, { title: "12", ab: 12 }).mount("#app");
+    </script>
+  </body>
+</html>

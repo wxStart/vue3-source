@@ -1,5 +1,5 @@
 export const nodeOpts = {
-  insert(child: HTMLElement, parent: HTMLElement, anchor = null) {
+  insert(child: HTMLElement, parent: HTMLElement, anchor:any = null) {
     parent.insertBefore(child, anchor); // anchor 为null 相当于 parent.appendChild(cihld)
   },
 

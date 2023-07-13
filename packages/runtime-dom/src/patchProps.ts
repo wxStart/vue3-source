@@ -8,6 +8,7 @@ const patchClass = (el: HTMLElement, value: unknown) => {
 
 const patchStyle = (el: HTMLElement, prev: object | null, next: object) => {
   const style = el.style;
+  next = next || {};
   for (const keyName in next) {
     // @ts-ignore
     style[keyName] = next[keyName];
@@ -15,7 +16,7 @@ const patchStyle = (el: HTMLElement, prev: object | null, next: object) => {
   if (prev) {
     for (const key in prev) {
       // @ts-ignore
-      if (next[key] === null) {
+      if (next[key] === null || next[key] === undefined) {
         // @ts-ignore
         style[key] = null;
       }
