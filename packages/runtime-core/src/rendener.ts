@@ -106,7 +106,7 @@ export function createRenderer(renderOptios: any) {
         hostPatchProp(el, key, null, props[key]);
       }
     }
-
+    // 插入或者移动到 某个位置之前
     hostInsert(el, container, auchor);
   };
   /** mountELement end*/
@@ -193,17 +193,21 @@ export function createRenderer(renderOptios: any) {
       if (i <= l1) {
         // c1 里面有多余的
         while (i <= l1) {
-          unmount(c1[i++]);
+          unmount(c1[i++]); //!移除时候会导致i进行增加
         }
       }
     }
 
     // unknow
+    console.log('i: ', i);
 
     const s1 = i; //i到l1就是 老的没有处理过的孩子列表
     const s2 = i; //i到l2就是 新的没有处理过的孩子列表
+    console.log('s2: ', s2);
     // 根据新的节点创建一个映射表 key:下标，用老的列表里面去找，如果没有就删除，有就复用。最后多余的去追加
     const newKeyIndexMap = new Map();
+
+    //! 循环新的记录它在c2的下标 { key1:c2Index1, key2: c2Index2 }
     for (let index = s2; index <= l2; index++) {
       const child = c2[index];
       newKeyIndexMap.set(child.key, index); //!key:下标 c2中的下标
@@ -212,6 +216,8 @@ export function createRenderer(renderOptios: any) {
     handlerS2length = handlerS2length > 0 ? handlerS2length : 0;
     const newIndexMapHanded = new Array(handlerS2length).fill(0);
 
+
+    //! 循环旧的   不在 c2的记录数组中就是要删除，在的就是直接比对
     for (let index = s1; index <= l1; index++) {
       // ! 新的索引 影射到老的索引
       const child = c1[index];
@@ -225,8 +231,10 @@ export function createRenderer(renderOptios: any) {
         patch(child, c2[newIndex], container);
       }
     }
-    console.log("newIndexMapHanded: ", newIndexMapHanded); //! c2中 s2到l2 对应c1中的下标加1
+    console.log("newIndexMapHanded: ", newIndexMapHanded); //! c2中 s2到l2 对应c1中的下标加1 只是个真假值判断是不是以前的元素直接使用el
 
+     //! 最后根据 newIndexMapHanded 数组的内容进行渲染， 值为0的就是代新建的， 不为0的就是要挪动的
+     //! 需要倒序创建
     for (let index = handlerS2length - 1; index >= 0; index--) {
       let lastIndex = s2 + index;
       let lastChild = c2[lastIndex];
@@ -235,7 +243,8 @@ export function createRenderer(renderOptios: any) {
         // 创建节点后插入
         patch(null, lastChild, container, auchor);
       } else {
-        //这里有消耗的
+        //这里有消耗的 
+        // 采用最长自增子序列 减少dom操作
         hostInsert(lastChild.el, container, auchor);
       }
     }
