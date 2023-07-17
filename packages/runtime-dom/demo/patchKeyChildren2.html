@@ -36,10 +36,10 @@
               title: proxy.title,
             },
             this.myCount.value % 2
-              ? ["a", "b", "c",'m', "d", "e", "f", "g"].map((el) =>
+              ? ["a", "b", 'm', "c", "d", "e", "f", "g"].map((el) =>
                   h("div", { key: el }, el)
                 )
-              : ["a", "b", "e", "c", "d", "h", "f", "g"].map((el) =>
+              : ["a", "b", "e", 'gg',"c", "d", "h", "f", "g"].map((el) =>
                   h("div", { key: el }, el)
                 )
           );

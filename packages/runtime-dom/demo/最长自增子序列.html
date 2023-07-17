@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /**
+         * 
+         * 
+       
+      // 最好的情况 [1,2,3,4,5,6]===> 下标 [0,1,2,3,4,5]
+
+      function getSequence1(array = []) {
+        let len = array.length;
+        const result = [0];
+        let lastIndex;
+        for (let index = 0; index < len; index++) {
+          const element = array[index];
+          if (element !== 0) {
+            lastIndex = result[result.length - 1];
+            if (element > array[lastIndex]) {
+              result.push(index);
+            }
+          }
+        }
+
+        console.log("resultIndex: ", result);
+      }
+
+      getSequence1([1, 2, 3, 4, 5, 6]);
+       */
+
+      /*
+      //  如果比末尾小  那么这个数就更加有潜力  就用替换的方式找到当期序列中比这个元素大的值替换
+      function getSequence2(array) {
+        let len = array.length;
+        const result = [0];
+        let lastIndex;
+        let start, end, middle;
+        for (let index = 0; index < len; index++) {
+          const element = array[index];
+          if (element !== 0) {
+            lastIndex = result[result.length - 1];
+            if (element > array[lastIndex]) {
+              result.push(index);
+            } else {
+              // 二分查找进行替换
+
+              start = 0;
+              end = result.length - 1;
+
+              while (start < end) {
+                // 相等的时候才会结束
+                middle = ((start + end) / 2) | 0;
+                if (array[result[middle]] < element) {
+                  //当前值比中间值大 找后面一半
+                  start = middle + 1;
+                } else {
+                  end = middle;
+                }
+              }
+              if (element < array[result[start]]) {
+                // 替换索引
+                result[start] = index;
+              }
+            }
+          }
+        }
+        console.log("resultIndex: ", result);
+      }
+      getSequence2([2, 3, 8, 9, 5]); // 下标  [0,1,4,3]    [2,3,5,9]
+      */
+
+      // getSequence2的结果不对[2,3,5,9]  真实的结果应该是[2,3,8,9]     需要进行调整
+
+      function getSequence3(array) {
+        let len = array.length;
+        let p = array.slice(0); //表示
+        const result = [0];
+        let lastIndex;
+        let start, end, middle;
+        for (let index = 0; index < len; index++) {
+          const element = array[index];
+          if (element !== 0) {
+            lastIndex = result[result.length - 1];
+            if (element > array[lastIndex]) {
+              // 记录当前起一个人的下标
+              p[index] = lastIndex;
+              result.push(index);
+              continue;
+            }
+            // 二分查找进行替换
+
+            start = 0;
+            end = result.length - 1;
+
+            while (start < end) {
+              // 相等的时候才会结束
+              middle = ((start + end) / 2) | 0;
+              if (array[result[middle]] < element) {
+                //当前值比中间值大 找后面一半
+                start = middle + 1;
+              } else {
+                end = middle;
+              }
+            }
+            if (element < array[result[start]]) {
+              // 替换   记录当前的前一个下标
+              p[index] = result[start - 1];
+              result[start] = index;
+            }
+          }
+        }
+
+        let i = result.length;
+        let last = result[i - 1];
+        while (i-- > 0) {
+          result[i] = last;
+          // 找到前一个记录的下标  在p里面  p里面记录了 当前的真实前一个下标
+          last = p[last];
+        }
+        return result;
+      }
+      //   getSequence3([2, 3, 8, 9, 5]); // 下标  [0,1,2,3]    [2,3,8,9]
+      console.log(
+        "最长自增子序列的下标：",
+        getSequence3([2, 3, 1, 5, 6, 8, 7, 9, 4])
+      );
+    </script>
+  </body>
+</html>

@@ -6,6 +6,8 @@ import { createComponentInstance, setupComponent } from "./component";
 import { normalizeVNode, Text, isSameVNode } from "./createVNode";
 import { h } from "./h";
 
+import { getSequence } from "./helper";
+
 // function createAppAPI(render: Function) {
 //   return (component: object, rootProps: object | null) => {
 //     const app = {
@@ -199,11 +201,11 @@ export function createRenderer(renderOptios: any) {
     }
 
     // unknow
-    console.log('i: ', i);
+    console.log("i: ", i);
 
     const s1 = i; //i到l1就是 老的没有处理过的孩子列表
     const s2 = i; //i到l2就是 新的没有处理过的孩子列表
-    console.log('s2: ', s2);
+    console.log("s2: ", s2);
     // 根据新的节点创建一个映射表 key:下标，用老的列表里面去找，如果没有就删除，有就复用。最后多余的去追加
     const newKeyIndexMap = new Map();
 
@@ -215,7 +217,6 @@ export function createRenderer(renderOptios: any) {
     let handlerS2length = l2 - s2 + 1;
     handlerS2length = handlerS2length > 0 ? handlerS2length : 0;
     const newIndexMapHanded = new Array(handlerS2length).fill(0);
-
 
     //! 循环旧的   不在 c2的记录数组中就是要删除，在的就是直接比对
     for (let index = s1; index <= l1; index++) {
@@ -231,10 +232,15 @@ export function createRenderer(renderOptios: any) {
         patch(child, c2[newIndex], container);
       }
     }
-    console.log("newIndexMapHanded: ", newIndexMapHanded); //! c2中 s2到l2 对应c1中的下标加1 只是个真假值判断是不是以前的元素直接使用el
 
-     //! 最后根据 newIndexMapHanded 数组的内容进行渲染， 值为0的就是代新建的， 不为0的就是要挪动的
-     //! 需要倒序创建
+    // 最长自增子序列
+    const quence = getSequence(newIndexMapHanded); //! 期望最长递增子序列,这个子序列就是不希望变的
+    // 找到期望最长不动的下标， 
+    console.log("quence: ", quence);
+    console.log("newIndexMapHanded: ", newIndexMapHanded); //! c2中 s2到l2 对应c1中的下标加1 只是个真假值判断是不是以前的元素直接使用el
+    let j = quence.length - 1;
+    //! 最后根据 newIndexMapHanded 数组的内容进行渲染， 值为0的就是代新建的， 不为0的就是要挪动的
+    //! 需要倒序创建
     for (let index = handlerS2length - 1; index >= 0; index--) {
       let lastIndex = s2 + index;
       let lastChild = c2[lastIndex];
@@ -243,9 +249,13 @@ export function createRenderer(renderOptios: any) {
         // 创建节点后插入
         patch(null, lastChild, container, auchor);
       } else {
-        //这里有消耗的 
+        //这里有消耗的
         // 采用最长自增子序列 减少dom操作
-        hostInsert(lastChild.el, container, auchor);
+        if (index !== quence[j]) {
+          hostInsert(lastChild.el, container, auchor);
+        } else {
+          j--;
+        }
       }
     }
   };
